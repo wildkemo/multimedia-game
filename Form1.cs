@@ -14,7 +14,19 @@ namespace multimedia_game
     {
         public Form1()
         {
-            InitializeComponent();
+            //InitializeComponent();
+            this.WindowState = FormWindowState.Maximized;
+            this.Load += Form1_Load1;
+        }
+
+        private void Form1_Load1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
