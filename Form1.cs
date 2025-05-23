@@ -66,6 +66,12 @@ namespace multimedia_game
                         r = 0;
                     }
 
+                    if (hero.img != null)
+                    {
+                        hero.img.Dispose();
+                    }
+                        
+
                     hero.img = new Bitmap(rightimages[r]);
                     hero.pos.X += 25;
                     hero.pos.Y -= 15;
@@ -82,6 +88,11 @@ namespace multimedia_game
                         r = 0;
                     }
 
+                    if (hero.img != null)
+                    {
+                        hero.img.Dispose();
+                    }
+
                     hero.img = new Bitmap(rightimages[r]);
                     hero.pos.X += 25;
                     
@@ -95,6 +106,11 @@ namespace multimedia_game
                     else
                     {
                         r = 0;
+                    }
+
+                    if (hero.img != null)
+                    {
+                        hero.img.Dispose();
                     }
 
                     hero.img = new Bitmap(rightimages[r]);
@@ -141,6 +157,11 @@ namespace multimedia_game
                         r = 0;
                     }
 
+                    if (hero.img != null)
+                    {
+                        hero.img.Dispose();
+                    }
+
                     hero.img = new Bitmap(leftimages[r]);
                     hero.pos.X -= 25;
                     hero.pos.Y -= 15;
@@ -157,6 +178,11 @@ namespace multimedia_game
                         r = 0;
                     }
 
+                    if (hero.img != null)
+                    {
+                        hero.img.Dispose();
+                    }
+
                     hero.img = new Bitmap(leftimages[r]);
                     hero.pos.X -= 25;
 
@@ -170,6 +196,11 @@ namespace multimedia_game
                     else
                     {
                         r = 0;
+                    }
+
+                    if (hero.img != null)
+                    {
+                        hero.img.Dispose();
                     }
 
                     hero.img = new Bitmap(leftimages[r]);
@@ -227,6 +258,11 @@ namespace multimedia_game
                             r = 0;
                         }
 
+                        if (hero.img != null)
+                        {
+                            hero.img.Dispose();
+                        }
+
                         hero.img = new Bitmap(rightimages[r]);
                         hero.pos.X += 25;
 
@@ -239,6 +275,11 @@ namespace multimedia_game
                     }
                     else
                     {
+                        if (hero.img != null)
+                        {
+                            hero.img.Dispose();
+                        }
+
                         hero.img = new Bitmap(rightimages[0]);
                     }
                 }
@@ -261,6 +302,11 @@ namespace multimedia_game
                             r = 0;
                         }
 
+                        if (hero.img != null)
+                        {
+                            hero.img.Dispose();
+                        }
+
                         hero.img = new Bitmap(leftimages[r]);
                         hero.pos.X -= 25;
 
@@ -273,6 +319,11 @@ namespace multimedia_game
                     }
                     else
                     {
+                        if (hero.img != null)
+                        {
+                            hero.img.Dispose();
+                        }
+
                         hero.img = new Bitmap(leftimages[0]);
                     }
                 }
@@ -345,9 +396,18 @@ namespace multimedia_game
 
         private void drawbuffer(Graphics g)
         {
-            cropped = null;
+            if (cropped != null)
+            {
+                cropped.Dispose();
+            }
+                
+            if (g2 != null)
+            {
+                g2.Dispose();
+            }
+                
+
             cropped = new Bitmap(w, h);
-            g2 = null;
             g2 = Graphics.FromImage(cropped);
             drawscene(g2);
             g.DrawImage(cropped, 0, 0);
