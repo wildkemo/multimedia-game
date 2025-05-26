@@ -10,6 +10,12 @@ using System.Windows.Forms;
 
 namespace multimedia_game
 {
+
+    public class Bullet
+    {
+        public Rectangle size;
+        public int speed;
+    }
     public partial class Form1: Form
     {
         Timer timer = new Timer();
@@ -41,6 +47,10 @@ namespace multimedia_game
         int ct = 0;
 
 
+        List<Bullet> bullets = new List<Bullet>();
+        bool k = false;
+
+
         public Form1()
         {
             //InitializeComponent();
@@ -48,9 +58,18 @@ namespace multimedia_game
             this.Load += Form1_Load1;
             this.Paint += Form1_Paint;
             this.KeyDown += Form1_KeyDown;
+            this.KeyUp += Form1_KeyUp;
             timer.Interval = 100;
             timer.Tick += Timer_Tick;
             
+        }
+
+        private void Form1_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F)
+            {
+                k = false;
+            }
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -63,7 +82,13 @@ namespace multimedia_game
 
             jumpRight();
             jumpLeft();
+            bulletmove();
 
+            if (k)
+            {
+                drawbullet();
+            }
+            
 
             drawbuffer(g);
         }
@@ -182,6 +207,11 @@ namespace multimedia_game
                 {
                     jumpleft = true;
                 }
+            }
+
+            if(e.KeyCode == Keys.F)
+            {
+                k = true;
             }
 
                 drawbuffer(g);
@@ -383,7 +413,35 @@ namespace multimedia_game
 
 
         }
+        void drawbullet()
+        {
+            Bullet pnn = new Bullet();
+            pnn.size = new Rectangle(hero.middle().X, hero.middle().Y, 10, 10); 
+            pnn.speed = 10; 
+            bullets.Add(pnn);
+        }
 
+        void bulletmove()
+        {
+
+            for (int i = 0; i < bullets.Count; i++) {
+
+                bullets[i].size.X += bullets[i].speed;
+            
+            }
+
+           /* for (int i = bullets.Count - 1; i >= 0; i--)
+            {
+                int bullet = bullets[i];
+                bullet.size.X += bullet.speed;
+
+                // Remove bullet if it goes off-screen
+                if (bullet.size.X > w)
+                {
+                    bullets.RemoveAt(i);
+                }
+            }*/
+        }
         private void Form1_Load(object sender, EventArgs e)
         {
 
@@ -428,7 +486,11 @@ namespace multimedia_game
                 g2.DrawImage(enemies[i].img, enemies[i].pos);
             }
 
-
+            for (int i=0;i<bullets.Count;i++ )
+            {
+                g2.FillRectangle(Brushes.Purple, bullets[i].size);
+                
+            }
 
 
         }
