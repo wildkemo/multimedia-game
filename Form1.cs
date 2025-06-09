@@ -14,7 +14,11 @@ namespace multimedia_game
     public class Bullet
     {
         public Rectangle size;
+        public Pen Pen = new Pen(Color.Yellow, 5);
         public int speed;
+        public int face = 1;
+        public int X, Y;
+        public int dx, dy;
     }
     public partial class Form1: Form
     {
@@ -103,7 +107,9 @@ namespace multimedia_game
 
             jumpRight();
             jumpLeft();
-            bulletmove();
+            bulletmove1();
+            bulletmove2();
+
 
             animateWizard();
 
@@ -208,6 +214,7 @@ namespace multimedia_game
             }
             else if (e.KeyCode == Keys.Right)
             {
+                hero.face = 1;
                 if (hero.status != "climbing")
                 {
                     
@@ -262,6 +269,7 @@ namespace multimedia_game
             }
             else if (e.KeyCode == Keys.Left)
             {
+                hero.face = 2;
                 if (hero.status != "climbing")
                 {
                     animateEnemies();
@@ -603,18 +611,38 @@ namespace multimedia_game
 
         void drawbullet()
         {
+            
             Bullet pnn = new Bullet();
-            pnn.size = new Rectangle(hero.middle().X, hero.middle().Y, 10, 10); 
-            pnn.speed = 10; 
-            bullets.Add(pnn);
+            pnn.X = hero.pos.X + (hero.img.Width / 2);
+            pnn.Y = hero.pos.Y + (hero.img.Height / 2);
+            pnn.dx = 10;
+            pnn.dy = 10;
+            pnn.size = new Rectangle(hero.middle().X, hero.middle().Y, 10, 10);
+            //pnn.speed = 10;
+            pnn.face = hero.face;
+
+            if(pnn.face == 1)
+            {
+            pnn.speed = 10;
+            }
+            else
+            {
+                pnn.speed = -10;
+            }
+             bullets.Add(pnn);
+            
+
+
+          
+
         }
 
-        void bulletmove()
+        void bulletmove1()
         {
 
             for (int i = 0; i < bullets.Count; i++) {
 
-                bullets[i].size.X += bullets[i].speed;
+                bullets[i].X += bullets[i].speed;
             
             }
 
@@ -628,6 +656,17 @@ namespace multimedia_game
                 {
                     bullets.RemoveAt(i);
                 }
+            }*/
+        }
+
+
+        void bulletmove2()
+        {/*
+            for (int i = 0; i < bullets.Count; i++)
+            {
+
+                bullets[i].size.X += bullets[i].speed;
+
             }*/
         }
         private void Form1_Load(object sender, EventArgs e)
@@ -659,6 +698,7 @@ namespace multimedia_game
         {
             g2.Clear(Color.White);
             croprect = new Rectangle(0, start, 1920, 1080);
+            Pen pen = new Pen(Color.White);
 
             g2.DrawImage(original,          // source
                new Rectangle(0, 0, w, h),  // where to draw in new bitmap
@@ -680,8 +720,7 @@ namespace multimedia_game
 
             for (int i=0;i<bullets.Count;i++ )
             {
-                g2.FillRectangle(Brushes.Purple, bullets[i].size);
-                
+                g2.FillRectangle(Brushes.Purple, bullets[i].X, bullets[i].Y, bullets[i].dx, bullets[i].dy);
             }
 
             if(wizard != null)
@@ -1073,6 +1112,7 @@ namespace multimedia_game
         public int health = 100;
         public string status = "normal";
         public int stage = 1;
+        public int face = 1;   // 1 lama ykon bass ymyn 
 
         public Point middle()
         {
