@@ -2,7 +2,6 @@ K:\Computer_Science\University\semester4\multimedia-game\multimedia-game\bin\Deb
 K:\Computer_Science\University\semester4\multimedia-game\multimedia-game\bin\Debug\multimedia-game.exe
 K:\Computer_Science\University\semester4\multimedia-game\multimedia-game\bin\Debug\multimedia-game.pdb
 K:\Computer_Science\University\semester4\multimedia-game\multimedia-game\obj\Debug\multimedia-game.csproj.AssemblyReference.cache
-K:\Computer_Science\University\semester4\multimedia-game\multimedia-game\obj\Debug\multimedia_game.Form1.resources
 K:\Computer_Science\University\semester4\multimedia-game\multimedia-game\obj\Debug\multimedia_game.Properties.Resources.resources
 K:\Computer_Science\University\semester4\multimedia-game\multimedia-game\obj\Debug\multimedia-game.csproj.GenerateResource.cache
 K:\Computer_Science\University\semester4\multimedia-game\multimedia-game\obj\Debug\multimedia-game.csproj.CoreCompileInputs.cache
@@ -18,3 +17,4 @@ D:\Taher\MSA\Semester 4\CS232\multimedia-game\multimedia-game\obj\Debug\multimed
 D:\Taher\MSA\Semester 4\CS232\multimedia-game\multimedia-game\obj\Debug\multimedia-game.csproj.CoreCompileInputs.cache
 D:\Taher\MSA\Semester 4\CS232\multimedia-game\multimedia-game\obj\Debug\multimedia-game.exe
 D:\Taher\MSA\Semester 4\CS232\multimedia-game\multimedia-game\obj\Debug\multimedia-game.pdb
+K:\Computer_Science\University\semester4\multimedia-game\multimedia-game\obj\Debug\multimedia_game.Bullet.resources

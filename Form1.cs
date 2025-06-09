@@ -105,6 +105,8 @@ namespace multimedia_game
             jumpLeft();
             bulletmove();
 
+            animateWizard();
+
             if (k)
             {
                 drawbullet();
@@ -553,8 +555,52 @@ namespace multimedia_game
             wizarddata.idle.Add("idle_wizard/frame_7.png");
 
 
+            /////////////////////////////// ATTACK WIZARD //////////////////////////////////////////////////////////
+
+            wizarddata.attack.Add("attack_wizard/frame_0.png");
+            wizarddata.attack.Add("attack_wizard/frame_1.png");
+            wizarddata.attack.Add("attack_wizard/frame_2.png");
+            wizarddata.attack.Add("attack_wizard/frame_3.png");
+            wizarddata.attack.Add("attack_wizard/frame_4.png");
+            wizarddata.attack.Add("attack_wizard/frame_5.png");
+            wizarddata.attack.Add("attack_wizard/frame_6.png");
+            wizarddata.attack.Add("attack_wizard/frame_7.png");
+
+
+            /////////////////////////////// HIT WIZARD //////////////////////////////////////////////////////////
+
+            wizarddata.hit.Add("hit_wizard/frame_0.png");
+            wizarddata.hit.Add("hit_wizard/frame_1.png");
+            wizarddata.hit.Add("hit_wizard/frame_2.png");
+
+
+            /////////////////////////////// DEATH WIZARD //////////////////////////////////////////////////////////
+
+            wizarddata.death.Add("death_wizard/frame_0.png");
+            wizarddata.death.Add("death_wizard/frame_1.png");
+            wizarddata.death.Add("death_wizard/frame_2.png");
+            wizarddata.death.Add("death_wizard/frame_3.png");
+            wizarddata.death.Add("death_wizard/frame_4.png");
+            wizarddata.death.Add("death_wizard/frame_5.png");
+            wizarddata.death.Add("death_wizard/frame_6.png");
+
+
+            wizard = new Wizard(wizarddata);
+            wizard.pos.X = 250;
+            wizard.pos.Y = -550;
+            scrollObjects.Add(wizard);
+
+            elevator = new Elevator();
+            elevator.pos.X = 0;
+            elevator.pos.Y = -180;
+            scrollObjects.Add(elevator);
+
 
         }
+
+
+
+
         void drawbullet()
         {
             Bullet pnn = new Bullet();
@@ -636,6 +682,12 @@ namespace multimedia_game
             {
                 g2.FillRectangle(Brushes.Purple, bullets[i].size);
                 
+            }
+
+            if(wizard != null)
+            {
+                g2.DrawImage(wizard.img, wizard.pos);
+
             }
 
             if (elevator != null)
