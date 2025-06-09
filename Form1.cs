@@ -18,14 +18,23 @@ namespace multimedia_game
         Graphics g;
         Bitmap cropped;
         Rectangle croprect;
+        Pen pen = new Pen(Color.Black, 10);
 
         Hero hero = new Hero();
         Enemy1Data enemy1data = new Enemy1Data();
         Enemy1 e1;
+        Ladder ladder1;
+        WizardData wizarddata = new WizardData();
+        Wizard wizard;
+        Elevator elevator;
 
         List<String> leftimages = new List<String>();
         List<String> rightimages = new List<String>();
         List<Enemy1> enemies = new List<Enemy1>();
+        List<Ladder> ladders = new List<Ladder>();
+        List<ScrollObject> scrollObjects = new List<ScrollObject>();
+
+
 
 
 
@@ -34,11 +43,17 @@ namespace multimedia_game
         int h;
 
         int start = 2160;
+        int currentstart = 2160;
+        int previousstart = 2160;
+        int futurepreviousstart = 2160;
         int r = 0;
         bool rightflag = true;
         bool jumpright = false;
         bool jumpleft = false;
         int ct = 0;
+        int ct2 = 0;
+        int flag = 0;
+
 
 
         public Form1()
@@ -56,7 +71,14 @@ namespace multimedia_game
         private void Timer_Tick(object sender, EventArgs e)
         {
 
-
+            if (hero.middle().X < elevator.pos.X + elevator.img.Width && (hero.stage == 2 || hero.stage == 3))
+            {
+                hero.status = "climbing";
+                hero.pos.X = elevator.pos.X -50;
+                hero.pos.Y = elevator.pos.Y - 200;
+                elevate();
+                //ct2++;
+            }
 
             animateEnemies();
 
@@ -64,115 +86,216 @@ namespace multimedia_game
             jumpRight();
             jumpLeft();
 
+            //gravity();
+
+            animateWizard();
 
             drawbuffer(g);
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Up)
+
+            if (e.KeyCode == Keys.D)
             {
-                
-            } 
-            else if(e.KeyCode == Keys.Down)
-            {
-                
+                e1.status = "death";
+                //e1.dead = true;
             }
-            else if (e.KeyCode == Keys.Right)
+            if (e.KeyCode == Keys.A)
             {
-                animateEnemies();
+                wizard.pos.Y -= 100;
+                wizard.status = "attack";
+            }
+            if (e.KeyCode == Keys.I)
+            {
+                wizard.pos.Y += 100;
+                wizard.status = "idle";
 
-                if (jumpright == false && jumpleft == false)
+
+            }
+
+            if (e.KeyCode == Keys.Up)
+            {
+                animateWizard();
+
+                for (int i = 0; i < ladders.Count; i++)
                 {
-                    rightflag = true;
-
-                    if (hero.pos.X < w - 256)
+                    if ((hero.middle().X >= ladders[i].pos.X && hero.middle().X <= ladders[i].pos.X + ladders[i].img.Width) && (hero.feet().Y >= ladders[i].pos.Y + 220))
                     {
+                        hero.status = "climbing";
 
-                        if (r < rightimages.Count - 1)
-                        {
-                            r++;
-                        }
-                        else
-                        {
-                            r = 0;
-                        }
+                        start -= 20;
 
-                        if (hero.img != null)
+                        for (int j = 0; j < scrollObjects.Count; j++)
                         {
-                            hero.img.Dispose();
+
+                            scrollObjects[j].pos = new Point(scrollObjects[j].pos.X, scrollObjects[j].pos.Y + 15);
                         }
 
-                        hero.img = new Bitmap(rightimages[r]);
-                        hero.pos.X += 25;
-
-                        if(hero.pos.Y < h - 256)
-                        {
-                            hero.pos.Y += 15;
-                            start += 15;
-                        }
 
                     }
                     else
                     {
-                        if (hero.img != null)
-                        {
-                            hero.img.Dispose();
-                        }
+                        hero.status = "normal";
+                        currentstart = start;
+                        futurepreviousstart = currentstart;
+                        hero.stage = 2;
 
-                        hero.img = new Bitmap(rightimages[0]);
+                        //MessageBox.Show(currentstart.ToString());
+                        //MessageBox.Show(hero.middle().ToString());
+
+
+                    }
+                }
+                drawbuffer(g);
+            } 
+            else if(e.KeyCode == Keys.Down)
+            {
+                animateWizard();
+
+                for (int i = 0; i < ladders.Count; i++)
+                {
+                    if(hero.stage == 1)
+                    {
+                        if ((hero.middle().X >= ladders[i].pos.X && hero.middle().X <= ladders[i].pos.X + ladders[i].img.Width) && (hero.feet().Y < ladders[i].pos.Y + ladders[i].img.Height - 380))
+                        {
+                            hero.status = "climbing";
+
+
+
+                            start += 20;
+
+                            for (int j = 0; j < scrollObjects.Count; j++)
+                            {
+
+                                scrollObjects[j].pos = new Point(scrollObjects[j].pos.X, scrollObjects[j].pos.Y - 15);
+                            }
+
+
+                        }
+                        else
+                        {
+                            hero.status = "normal";
+                            currentstart = start;
+
+                        }
+                    }
+                }
+                drawbuffer(g);
+            }
+            else if (e.KeyCode == Keys.Right)
+            {
+                if (hero.status != "climbing")
+                {
+                    
+                    animateEnemies();
+                    animateWizard();
+
+                    if (jumpright == false && jumpleft == false)
+                    {
+                        rightflag = true;
+
+                        if (hero.pos.X < w - 256)
+                        {
+
+                            if (r < rightimages.Count - 1)
+                            {
+                                r++;
+                            }
+                            else
+                            {
+                                r = 0;
+                            }
+
+                            if (hero.img != null)
+                            {
+                                hero.img.Dispose();
+                            }
+
+                            hero.img = new Bitmap(rightimages[r]);
+                            hero.pos.X += 25;
+                            hero.status = "normal";
+                            //gravity();
+
+                            //if (hero.pos.Y < h - 256)
+                            //{
+                            //    hero.pos.Y += 15;
+                            //    start += 15;
+                            //}
+
+                        }
+                        else
+                        {
+                            if (hero.img != null)
+                            {
+                                hero.img.Dispose();
+                            }
+
+                            hero.img = new Bitmap(rightimages[0]);
+                        }
                     }
                 }
 
             }
             else if (e.KeyCode == Keys.Left)
             {
-                animateEnemies();
-
-                if (jumpright == false && jumpleft == false)
+                if (hero.status != "climbing")
                 {
-                    rightflag = false;
+                    animateEnemies();
+                    animateWizard();
 
-                    if (hero.pos.X > 0)
+
+                    if (jumpright == false && jumpleft == false)
                     {
-                        if (r < leftimages.Count - 1)
+                        rightflag = false;
+
+                        if (hero.pos.X > 0)
                         {
-                            r++;
+                            if (r < leftimages.Count - 1)
+                            {
+                                r++;
+                            }
+                            else
+                            {
+                                r = 0;
+                            }
+
+                            if (hero.img != null)
+                            {
+                                hero.img.Dispose();
+                            }
+
+                            hero.img = new Bitmap(leftimages[r]);
+                            hero.pos.X -= 25;
+                            hero.status = "normal";
+                            //gravity();
+
+
+                            //if (hero.pos.Y < h - 256)
+                            //{
+                            //    hero.pos.Y += 15;
+                            //    start += 15;
+                            //}
+
                         }
                         else
                         {
-                            r = 0;
+                            if (hero.img != null)
+                            {
+                                hero.img.Dispose();
+                            }
+
+                            hero.img = new Bitmap(leftimages[0]);
                         }
-
-                        if (hero.img != null)
-                        {
-                            hero.img.Dispose();
-                        }
-
-                        hero.img = new Bitmap(leftimages[r]);
-                        hero.pos.X -= 25;
-
-                        if (hero.pos.Y < h - 256)
-                        {
-                            hero.pos.Y += 15;
-                            start += 15;
-                        }
-
                     }
-                    else
-                    {
-                        if (hero.img != null)
-                        {
-                            hero.img.Dispose();
-                        }
 
-                        hero.img = new Bitmap(leftimages[0]);
-                    }
                 }
-
+                
             }
             else if (e.KeyCode == Keys.Space)
             {
+                hero.status = "normal";
+
                 if (rightflag == true)
                 {
                     jumpright = true;
@@ -184,7 +307,7 @@ namespace multimedia_game
                 }
             }
 
-                drawbuffer(g);
+            drawbuffer(g);
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -375,10 +498,74 @@ namespace multimedia_game
 
             e1 = new Enemy1(enemy1data);
             e1.pos = new Point((w/2) - 256, h - 450);
+            e1.w = w;
+            e1.h = h;
             enemies.Add(e1);
+            scrollObjects.Add(e1);
+
+
+            ladder1 = new Ladder();
+            ladder1.pos.X = w - 200;
+            ladder1.pos.Y = -150;
+            ladder1.id = 1;
+            ladder1.img = new Bitmap("ladder2.png");
+            ladders.Add(ladder1);
+            scrollObjects.Add(ladder1);
 
 
 
+
+            /////////////////////////////// IDLE WIZARD //////////////////////////////////////////////////////////
+
+            wizarddata.idle.Add("idle_wizard/frame_0.png");
+            wizarddata.idle.Add("idle_wizard/frame_1.png");
+            wizarddata.idle.Add("idle_wizard/frame_2.png");
+            wizarddata.idle.Add("idle_wizard/frame_3.png");
+            wizarddata.idle.Add("idle_wizard/frame_4.png");
+            wizarddata.idle.Add("idle_wizard/frame_5.png");
+            wizarddata.idle.Add("idle_wizard/frame_6.png");
+            wizarddata.idle.Add("idle_wizard/frame_7.png");
+
+
+            /////////////////////////////// ATTACK WIZARD //////////////////////////////////////////////////////////
+
+            wizarddata.attack.Add("attack_wizard/frame_0.png");
+            wizarddata.attack.Add("attack_wizard/frame_1.png");
+            wizarddata.attack.Add("attack_wizard/frame_2.png");
+            wizarddata.attack.Add("attack_wizard/frame_3.png");
+            wizarddata.attack.Add("attack_wizard/frame_4.png");
+            wizarddata.attack.Add("attack_wizard/frame_5.png");
+            wizarddata.attack.Add("attack_wizard/frame_6.png");
+            wizarddata.attack.Add("attack_wizard/frame_7.png");
+
+
+            /////////////////////////////// HIT WIZARD //////////////////////////////////////////////////////////
+
+            wizarddata.hit.Add("hit_wizard/frame_0.png");
+            wizarddata.hit.Add("hit_wizard/frame_1.png");
+            wizarddata.hit.Add("hit_wizard/frame_2.png");
+
+
+            /////////////////////////////// DEATH WIZARD //////////////////////////////////////////////////////////
+
+            wizarddata.death.Add("death_wizard/frame_0.png");
+            wizarddata.death.Add("death_wizard/frame_1.png");
+            wizarddata.death.Add("death_wizard/frame_2.png");
+            wizarddata.death.Add("death_wizard/frame_3.png");
+            wizarddata.death.Add("death_wizard/frame_4.png");
+            wizarddata.death.Add("death_wizard/frame_5.png");
+            wizarddata.death.Add("death_wizard/frame_6.png");
+
+
+            wizard = new Wizard(wizarddata);
+            wizard.pos.X = 250;
+            wizard.pos.Y = -550;
+            scrollObjects.Add(wizard);
+
+            elevator = new Elevator();
+            elevator.pos.X = 0;
+            elevator.pos.Y = -180;
+            scrollObjects.Add(elevator);
 
 
 
@@ -420,16 +607,42 @@ namespace multimedia_game
                GraphicsUnit.Pixel        // unit type (pixels)
              );
 
+            if (ladder1 != null)
+            {
+                g2.DrawImage(ladder1.img, ladder1.pos);
 
-            g2.DrawImage(hero.img, hero.pos);
+            }
+
 
             for(int i = 0; i < enemies.Count; i++)
             {
                 g2.DrawImage(enemies[i].img, enemies[i].pos);
             }
 
+            if(wizard != null)
+            {
+                g2.DrawImage(wizard.img, wizard.pos);
+
+            }
+
+            if (elevator != null)
+            {
+                g2.DrawImage(elevator.img, elevator.pos);
+
+            }
+
+            if (hero.stage == 3)
+            {
+                g2.DrawLine(pen, 200, hero.feet().Y -160, w, hero.feet().Y - 160);
+                
+            }
 
 
+
+
+
+
+            g2.DrawImage(hero.img, hero.pos);
 
         }
 
@@ -459,7 +672,8 @@ namespace multimedia_game
                     hero.img = new Bitmap(rightimages[r]);
                     hero.pos.X += 25;
                     hero.pos.Y -= 15;
-                    start -= 15;
+                    //start -= 15;
+                    //e1.pos.Y += 15;
                 }
                 else if (ct >= 3 && ct < 6)
                 {
@@ -500,7 +714,9 @@ namespace multimedia_game
                     hero.img = new Bitmap(rightimages[r]);
                     hero.pos.X += 25;
                     hero.pos.Y += 15;
-                    start += 15;
+                    //start += 15;
+                    //e1.pos.Y -= 15;
+
                 }
 
 
@@ -544,7 +760,9 @@ namespace multimedia_game
                     hero.img = new Bitmap(leftimages[r]);
                     hero.pos.X -= 25;
                     hero.pos.Y -= 15;
-                    start -= 15;
+                    //start -= 15;
+                    //e1.pos.Y += 15;
+
                 }
                 else if (ct >= 3 && ct < 6)
                 {
@@ -585,7 +803,9 @@ namespace multimedia_game
                     hero.img = new Bitmap(leftimages[r]);
                     hero.pos.X -= 25;
                     hero.pos.Y += 15;
-                    start += 15;
+                    //start += 15;
+                    //e1.pos.Y -= 15;
+
                 }
 
 
@@ -612,46 +832,151 @@ namespace multimedia_game
             for (int i = 0; i < enemies.Count; i++)
             {
 
-                if (hero.middle().X >= enemies[i].middle().X - 250 && hero.middle().X <= enemies[i].middle().X + 250)
+                if (enemies[i].status != "death")
                 {
-                    if (hero.middle().X - enemies[i].middle().X < 0)
+                    if (hero.middle().X >= enemies[i].middle().X - 250 && hero.middle().X <= enemies[i].middle().X + 250)
                     {
-                        enemies[i].direction = "left";
+                        if (hero.middle().X - enemies[i].middle().X < 0)
+                        {
+                            enemies[i].direction = "left";
+                        }
+                        else
+                        {
+                            enemies[i].direction = "right";
+                        }
+
+                        enemies[i].status = "attack";
+
                     }
                     else
                     {
-                        enemies[i].direction = "right";
+                        enemies[i].status = "move";
+                        //enemies[i].t_idle = 0;
+                        //enemies[i].t_attack = 0;
                     }
-
-                    enemies[i].status = "attack";
-
                 }
 
-                else
-                {
-                    enemies[i].status = "idle";
-                    //enemies[i].t_idle = 0;
-                    //enemies[i].t_attack = 0;
-                }
 
-            }
 
-            for (int i = 0; i < enemies.Count; i++)
-            {
                 enemies[i].idle();
                 enemies[i].attack();
+                enemies[i].move();
+                enemies[i].death();
+
+                if (enemies[i].dead == true)
+                {
+                    enemies.RemoveAt(i);
+                }
 
             }
+
+            
         }
 
 
 
 
 
+        private void animateWizard()
+        {
+            if (wizard != null)
+            {
+                wizard.idle();
+                wizard.attack();
+            }
+        }
 
 
 
 
+        //private void gravity()
+        //{
+        //    if (hero.status != "climbing")
+        //    {
+
+        //        if (start < currentstart)
+        //        {
+        //            start += 20;
+        //            for (int i = 0; i < scrollObjects.Count; i++)
+        //            {
+
+        //                scrollObjects[i].pos = new Point(scrollObjects[i].pos.X, scrollObjects[i].pos.Y - 15);
+        //            }
+        //        }
+
+                
+        //    }
+        //}
+
+
+
+
+
+
+        private void elevate()
+        {
+            if(flag == 0)
+            {
+                if (start > 0)
+                {
+                    start -= 20;
+
+                    for (int j = 0; j < scrollObjects.Count; j++)
+                    {
+                        scrollObjects[j].pos = new Point(scrollObjects[j].pos.X, scrollObjects[j].pos.Y + 15);
+
+                    }
+
+                    elevator.pos.Y -= 15;
+                }
+                else
+                {
+                    hero.status = "normal";
+                    currentstart = start;
+                    previousstart = futurepreviousstart;
+                    futurepreviousstart = currentstart;
+                    hero.stage = 3;
+                    hero.pos.X += 250;
+                    //hero.pos.Y += 50;
+                    flag = 1;
+                    //MessageBox.Show("3");    
+
+                    
+                }
+            }
+            else if(flag == 1)
+            {
+                if (start < previousstart)
+                {
+                    hero.stage = 2;
+                    start += 20;
+
+                    for (int j = 0; j < scrollObjects.Count; j++)
+                    {
+                        scrollObjects[j].pos = new Point(scrollObjects[j].pos.X, scrollObjects[j].pos.Y - 15);
+
+                    }
+
+                    elevator.pos.Y += 15;
+                }
+                else
+                {
+                    hero.status = "normal";
+                    start = previousstart;
+                    currentstart = start;
+                    futurepreviousstart = currentstart;
+                    previousstart = currentstart;
+                    hero.stage = 2;
+                    hero.pos.X += 250;
+                    hero.pos.Y += 40;
+                    flag = 0;
+                    //MessageBox.Show("2");
+
+                }
+            }
+
+            
+        }
 
 
 
@@ -660,27 +985,60 @@ namespace multimedia_game
 
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public partial class Hero
     {
         public Point pos;
         public Bitmap img = new Bitmap("Rframe_0.png");
+        public int health = 100;
+        public string status = "normal";
+        public int stage = 1;
 
         public Point middle()
         {
             Point p = new Point((this.pos.X + (this.img.Width / 2)), (this.pos.Y + (this.img.Height / 2)));
             return p;
         }
+
+        public Point feet()
+        {
+            Point p = new Point( this.middle().X, this.middle().Y + this.img.Height);
+            return p;
+        }
+
     }
 
-    public partial class Enemy1
+    public partial class Enemy1 : ScrollObject
     {
-        public Point pos;
+        //public new Point pos;
         public Bitmap img;
         public Enemy1Data data = new Enemy1Data();
+        public int health = 100;
+        public int w;
+        public int h;
         public string status = "idle";
         public string direction = "left";
         public int t_idle = 0;
         public int t_attack = 0;
+        public int t_move = 0;
+        public int t_death = 0;
+
+        public bool dead = false; 
 
 
         public Enemy1(Enemy1Data exdata)
@@ -785,6 +1143,115 @@ namespace multimedia_game
         }
 
 
+
+        public void move()
+        {
+            if(this.status == "move")
+            {
+                if (this.direction == "left")
+                {
+                    if (this.pos.X >= this.w/2)
+                    {
+                        if (t_move < data.runLeft.Count - 1)
+                        {
+                            t_move++;
+                        }
+                        else
+                        {
+                            t_move = 0;
+                        }
+
+                        if (this.img != null)
+                        {
+                            this.img.Dispose();
+                        }
+
+                        this.img = new Bitmap(data.runLeft[t_move]);
+
+                        this.pos.X -= 30;
+                    }
+                    else
+                    {
+                        this.direction = "right";
+                    }
+                }
+                else if (this.direction == "right")
+                {
+                    if (this.pos.X <= this.w - 512)
+                    {
+                        if (t_move < data.runRight.Count - 1)
+                        {
+                            t_move++;
+                        }
+                        else
+                        {
+                            t_move = 0;
+                        }
+
+                        if (this.img != null)
+                        {
+                            this.img.Dispose();
+                        }
+
+                        this.img = new Bitmap(data.runRight[t_move]);
+
+                        this.pos.X += 30;
+                    }
+                    else
+                    {
+                        this.direction = "left";
+                    }
+
+                }
+            }
+
+        }
+
+
+        public void death()
+        {
+            if (this.status == "death")
+            {
+                if (this.direction == "left")
+                {
+                    if (this.img != null)
+                    {
+                        this.img.Dispose();
+                    }
+
+                    this.img = new Bitmap(data.deathLeft[t_death]);
+
+                    if (t_death < data.deathLeft.Count - 1)
+                    {
+                        t_death++;
+                    }
+                    else
+                    {
+                        dead = true;
+                    }
+                }
+                else if (this.direction == "right")
+                {
+                    if (this.img != null)
+                    {
+                        this.img.Dispose();
+                    }
+
+                    this.img = new Bitmap(data.deathRight[t_death]);
+
+                    if (t_death < data.deathRight.Count - 1)
+                    {
+                        t_death++;
+                    }
+                    else
+                    {
+                        dead = true;
+                    }
+                }
+            }
+        }
+
+
     }
 
     public partial class Enemy1Data
@@ -801,6 +1268,102 @@ namespace multimedia_game
         public List<string> hurtLeft = new List<string>();
         public List<string> deathLeft = new List<string>();
 
+    }
+
+    public partial class WizardData
+    {
+        public List<string> idle = new List<string>();
+        public List<string> attack = new List<string>();
+        public List<string> hit = new List<string>();
+        public List<string> death = new List<string>();
+
+    }
+
+    public partial class Wizard : ScrollObject
+    {
+        public WizardData data;
+        public Bitmap img;
+        public string status = "idle";
+        public bool dead = false;
+        public int t_idle = 0;
+        public int t_attack = 0;
+
+
+        public Wizard(WizardData exdata)
+        {
+            this.data = exdata;
+            img = new Bitmap(data.idle[0]);
+        }
+
+        public void idle()
+        {
+            if (this.status == "idle")
+            {
+                if (t_idle < data.idle.Count - 1)
+                {
+                    t_idle++;
+                }
+                else
+                {
+                    t_idle = 0;
+                }
+
+                if (this.img != null)
+                {
+                    this.img.Dispose();
+                }
+
+                this.img = new Bitmap(data.idle[t_idle]);
+            }
+
+        }
+
+
+        public void attack()
+        {
+            if (this.status == "attack")
+            {
+                if (t_attack < data.attack.Count - 1)
+                {
+                    t_attack++;
+                }
+                else
+                {
+                    t_attack = 0;
+                }
+
+                if (this.img != null)
+                {
+                    this.img.Dispose();
+                }
+
+                this.img = new Bitmap(data.attack[t_attack]);
+            }
+        }
+
+
+    }
+
+
+    public partial class Ladder : ScrollObject
+    {
+        //public new Point pos;
+        public Bitmap img;
+        public int id;
+
+    }
+
+    public abstract class ScrollObject
+    {
+        public Point pos;
+        
+
+    }
+
+
+    public partial class Elevator : ScrollObject
+    {
+        public Bitmap img = new Bitmap("ufo.png");
     }
 
 
