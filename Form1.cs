@@ -30,6 +30,9 @@ namespace multimedia_game
         Rectangle croprect;
         Pen pen = new Pen(Color.Black, 10);
 
+        int bullettimer = 0;
+        int timebetbullet = 5;
+
         Hero hero = new Hero();
         Enemy1Data enemy1data = new Enemy1Data();
         Enemy1 e1;
@@ -77,7 +80,7 @@ namespace multimedia_game
             this.Paint += Form1_Paint;
             this.KeyDown += Form1_KeyDown;
             this.KeyUp += Form1_KeyUp;
-            timer.Interval = 100;
+            timer.Interval = 30;
             timer.Tick += Timer_Tick;
             
         }
@@ -117,7 +120,8 @@ namespace multimedia_game
             {
                 drawbullet();
             }
-            
+
+            bullettimer++;
 
             drawbuffer(g);
         }
@@ -611,7 +615,14 @@ namespace multimedia_game
 
         void drawbullet()
         {
-            
+
+            int maxbullet = 100;
+
+            if (bullettimer < timebetbullet || bullets.Count >= maxbullet)
+            {
+                return;
+            }
+
             Bullet pnn = new Bullet();
             pnn.X = hero.pos.X + (hero.img.Width / 2);
             pnn.Y = hero.pos.Y + (hero.img.Height / 2);
@@ -633,7 +644,7 @@ namespace multimedia_game
             
 
 
-          
+            bullettimer = 0;
 
         }
 
@@ -643,7 +654,12 @@ namespace multimedia_game
             for (int i = 0; i < bullets.Count; i++) {
 
                 bullets[i].X += bullets[i].speed;
-            
+
+                if (bullets[i].X < 0 || bullets[i].X > w)
+                {
+                    bullets.RemoveAt(i);
+                }
+
             }
 
            /* for (int i = bullets.Count - 1; i >= 0; i--)
@@ -695,7 +711,7 @@ namespace multimedia_game
         }
 
         private void drawscene(Graphics g2)
-        {
+        {                                                                                                                                    
             g2.Clear(Color.White);
             croprect = new Rectangle(0, start, 1920, 1080);
             Pen pen = new Pen(Color.White);
