@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -103,6 +104,11 @@ namespace multimedia_game
                 hero.pos.Y = elevator.pos.Y - 200;
                 elevate();
                 //ct2++;
+            }
+
+            for (int i = 0; i < enemies.Count; i++)
+            {
+                enemies[i].UpdateAnimation();
             }
 
             animateEnemies();
@@ -612,7 +618,13 @@ namespace multimedia_game
 
 
 
+       /* public void UpdateAnimation()
+        {
+            *//*if(health<=0)
+            {
 
+            }*//*
+        }*/
         void drawbullet()
         {
 
@@ -660,7 +672,40 @@ namespace multimedia_game
                     bullets.RemoveAt(i);
                 }
 
+                for (int j = 0; j < enemies.Count; j++)
+                {
+
+                    Enemy1 enemy = enemies[j];
+
+                    int bulletL = bullets[i].X;
+                    int bulletR = bullets[i].X + bullets[i].dx;
+                    int bulletT = bullets[i].Y;
+                    int bulletB = bullets[i].Y + bullets[i].dy;
+
+
+                    int enemyL = enemy.pos.X;
+                    int enemyR = enemy.pos.X + enemy.img.Width;
+                    int enemyT = enemy.pos.Y;
+                    int enemyB = enemy.pos.Y + enemy.img.Height;
+
+
+                    if (bulletR > enemyL && bulletL < enemyR && bulletT < enemyB && bulletB > enemyT)
+                    {
+                        enemy.health -= 20;
+
+                        bullets.RemoveAt(i);
+
+                        if (enemy.health <= 0)
+                        {
+                            enemies.RemoveAt(i);
+                        }
+
+                        break;
+                    }
+                }
             }
+
+
 
            /* for (int i = bullets.Count - 1; i >= 0; i--)
             {
@@ -976,6 +1021,8 @@ namespace multimedia_game
                     }
                 }
 
+                enemies[i].UpdateAnimation();
+
 
 
                 enemies[i].idle();
@@ -984,6 +1031,12 @@ namespace multimedia_game
                 enemies[i].death();
 
                 if (enemies[i].dead == true)
+                {
+                    enemies.RemoveAt(i);
+                }
+
+
+                if(enemies[i].health <= 0 && enemies[i].t_death >= enemies[i].data.deathRight.Count - 1)
                 {
                     enemies.RemoveAt(i);
                 }
@@ -1159,8 +1212,86 @@ namespace multimedia_game
         public int t_move = 0;
         public int t_death = 0;
 
-        public bool dead = false; 
+        public bool dead = false;
 
+        public void UpdateAnimation()
+        {
+            if (health <= 0)
+            {
+                status = "death";
+                t_death++;
+                if (t_death >= data.deathRight.Count)
+                {
+                    t_death = data.deathRight.Count - 1;
+                }
+
+                if (direction == "right")
+                {
+                    img = new Bitmap(data.deathRight[t_death]);
+                }
+                else
+                {
+                    img = new Bitmap(data.deathLeft[t_death]);
+                }
+            }
+            else
+            {
+                if(status == "idle")
+                {
+                    if (direction == "right")
+                    {
+                        if (t_idle < data.idleRight.Count - 1)
+                        {
+                            t_idle++;
+                        }
+                        else
+                        {
+                            t_idle = 0;
+                        }
+                        img = new Bitmap(data.deathRight[t_idle]);
+                    }
+                    else
+                    {
+                        if (t_idle < data.idleRight.Count - 1)
+                        {
+                            t_idle++;
+                        }
+                        else
+                        {
+                            t_idle = 0;
+                        }
+                        img = new Bitmap(data.deathLeft[t_idle]) ;
+                    }
+                }
+                else if(status == "attack")
+                {
+                    if (direction == "right")
+                    {
+                        if (t_attack < data.attackRight.Count - 1)
+                        {
+                            t_attack++;
+                        }
+                        else
+                        {
+                            t_attack = 0;
+                        }
+                        img = new Bitmap(data.attackRight[t_attack]);
+                    }
+                    else
+                    {
+                        if (t_attack < data.attackLeft.Count - 1)
+                        {
+                            t_attack++;
+                        }
+                        else
+                        {
+                            t_attack = 0;
+                        }
+                        img = new Bitmap (data.attackLeft[t_attack]);
+                    }
+                }
+            }
+        }
 
         public Enemy1(Enemy1Data exdata)
         {
