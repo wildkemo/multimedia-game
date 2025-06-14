@@ -96,7 +96,7 @@ namespace multimedia_game
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-
+            bullettimer++;
             if (hero.middle().X < elevator.pos.X + elevator.img.Width && (hero.stage == 2 || hero.stage == 3))
             {
                 hero.status = "climbing";
@@ -109,6 +109,14 @@ namespace multimedia_game
             for (int i = 0; i < enemies.Count; i++)
             {
                 enemies[i].UpdateAnimation();
+            }
+
+            if (hero.dead ==1)
+            {
+                // Handle game over - show message, restart, etc.
+                timer.Stop();
+                MessageBox.Show("Game Over! Hero is dead.");
+                return;
             }
 
             animateEnemies();
@@ -127,7 +135,7 @@ namespace multimedia_game
                 drawbullet();
             }
 
-            bullettimer++;
+            
 
             drawbuffer(g);
         }
@@ -617,6 +625,34 @@ namespace multimedia_game
         }
 
 
+        void animatewizard()
+        {
+            if (wizard != null)
+            {
+                // Update the wizard's animation based on its current status
+                if (wizard.status == "idle")
+                {
+                    wizard.idle();
+                }
+                else if (wizard.status == "attack")
+                {
+                    wizard.attack();
+                }
+                else if (wizard.status == "death")
+                {
+                    wizard.death();
+                }
+
+                // Remove the wizard after the death animation completes
+                if (wizard.health <= 0 && wizard.t_death >= wizard.data.death.Count - 1)
+                {
+                    wizard.dead = true;
+                    wizard = null; // Remove the wizard from the game
+                }
+            }
+        }
+
+
 
        /* public void UpdateAnimation()
         {
@@ -637,7 +673,7 @@ namespace multimedia_game
 
             Bullet pnn = new Bullet();
             pnn.X = hero.pos.X + (hero.img.Width / 2);
-            pnn.Y = hero.pos.Y + (hero.img.Height / 2);
+            pnn.Y = hero.pos.Y + (hero.img.Height / 2) - 60;
             pnn.dx = 10;
             pnn.dy = 10;
             pnn.size = new Rectangle(hero.middle().X, hero.middle().Y, 10, 10);
@@ -702,6 +738,32 @@ namespace multimedia_game
 
                         break;
                     }
+
+
+                    
+
+
+                    
+                    int wizardL = wizard.pos.X;
+                    int wizardR = wizard.pos.X + wizard.img.Width;
+                    int wizardT = wizard.pos.Y;
+                    int wizardB = wizard.pos.Y + wizard.img.Height;
+
+                    
+                    if (bulletR > wizardL && bulletL < wizardR && bulletT < wizardB && bulletB > wizardT)
+                    {
+                        wizard.health -= 20;
+
+                        
+                        bullets.RemoveAt(i);
+
+                        
+                        if (wizard.health <= 0)
+                        {
+                            wizard.status = "death";
+                        }
+                    }
+                
                 }
             }
 
@@ -1041,7 +1103,46 @@ namespace multimedia_game
                     enemies.RemoveAt(i);
                 }
 
+                if (enemies[i].status == "attack" && enemies[i].t_attack == enemies[i].data.attackRight.Count / 2)
+                {
+                    
+                    if (enemyhithero(enemies[i]))
+                    {
+                        hero.Damage(20);
+                    }
+                }
+
             }
+
+            
+        }
+
+
+        bool enemyhithero(Enemy1 enemy)
+        {
+           
+            int heroL = hero.pos.X;
+            int heroR = hero.pos.X + hero.img.Width;
+            int heroT = hero.pos.Y;
+            int heroB = hero.pos.Y + hero.img.Height;
+
+            
+            int enemyL = enemy.pos.X;
+            int enemyR = enemy.pos.X + enemy.img.Width;
+            int enemyT = enemy.pos.Y;
+            int enemyB = enemy.pos.Y + enemy.img.Height;
+
+            if (heroR < enemyL || heroL > enemyR)
+            {
+                return false; 
+            }
+
+            if (heroB < enemyT || heroT > enemyB)
+            {
+                return false; 
+            }
+
+            return true;
 
             
         }
@@ -1182,6 +1283,26 @@ namespace multimedia_game
         public string status = "normal";
         public int stage = 1;
         public int face = 1;   // 1 lama ykon bass ymyn 
+        public int dead = 0;
+
+
+        public void Damage(int damage)
+        {
+            if( dead != 0)
+            {
+                health -= damage;
+                if(health <= 0)
+                {
+                    health = 0;
+                    dead = 1;
+                }
+            }
+
+            if(dead == 1)
+            {
+
+            }
+        }
 
         public Point middle()
         {
@@ -1194,6 +1315,8 @@ namespace multimedia_game
             Point p = new Point( this.middle().X, this.middle().Y + this.img.Height);
             return p;
         }
+
+        
 
     }
 
@@ -1539,7 +1662,18 @@ namespace multimedia_game
         public bool dead = false;
         public int t_idle = 0;
         public int t_attack = 0;
+        public int health = 100;
+        public int t_death = 0;
 
+        public void death()
+        {
+
+        }
+
+        private void animatedWizard()
+        {
+            
+        }
 
         public Wizard(WizardData exdata)
         {
