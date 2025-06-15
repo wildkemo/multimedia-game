@@ -21,6 +21,24 @@ namespace multimedia_game
         public int X, Y;
         public int dx, dy;
     }
+
+    public class LEnemy: ScrollObject
+    {
+        public Bitmap img = new Bitmap("LEnemy.png");
+        public int health = 100;
+
+
+
+    }
+
+    public class Laser : ScrollObject
+    {
+       
+        public Pen Pen = new Pen(Color.Yellow, 5);
+        
+        public int flag = 1;
+    }
+
     public partial class Form1: Form
     {
         Timer timer = new Timer();
@@ -41,7 +59,8 @@ namespace multimedia_game
         WizardData wizarddata = new WizardData();
         Wizard wizard;
         Elevator elevator;
-
+        List<Laser> Lasers = new List<Laser>();
+        List<LEnemy>Plane = new List<LEnemy>();
         List<String> leftimages = new List<String>();
         List<String> rightimages = new List<String>();
         List<Enemy1> enemies = new List<Enemy1>();
@@ -51,7 +70,8 @@ namespace multimedia_game
 
 
 
-
+        bool moveup = true;
+        int range = 100;
 
         int w;
         int h;
@@ -68,6 +88,10 @@ namespace multimedia_game
         int ct2 = 0;
         int flag = 0;
         bool jumpupflag = false;
+
+        int laserTimer = 0; 
+        /*int laserInterval = 30; */
+        bool isLaserVisible = false;
 
 
         List<Bullet> bullets = new List<Bullet>();
@@ -97,6 +121,14 @@ namespace multimedia_game
 
         private void Timer_Tick(object sender, EventArgs e)
         {
+
+            laserTimer++;
+            if (laserTimer >= 2)
+            {
+                isLaserVisible = !isLaserVisible;
+                laserTimer = 0;
+            }
+
             bullettimer++;
             if (hero != null)
             {
@@ -150,7 +182,7 @@ namespace multimedia_game
             jumpLeft();
             jumpup();
             bulletmove2();
-
+            LEnemyMove();
 
             if (wizard != null)
             {
@@ -456,6 +488,8 @@ namespace multimedia_game
 
         private void Form1_Load1(object sender, EventArgs e)
         {
+            CreatLEnemy();
+
             timer.Start();
 
             w = this.Width;
@@ -708,6 +742,32 @@ namespace multimedia_game
 
         }
 
+        void CreatLEnemy()
+        {
+            LEnemy pnn = new LEnemy();
+            pnn.pos = new Point(this.ClientSize.Width / 2, -1100);
+            pnn.img = new Bitmap("LEnemy.png");
+            pnn.img.MakeTransparent();
+            Plane.Add(pnn);
+
+            scrollObjects.Add(pnn);
+        }
+
+        void LEnemyMove()
+        {
+            
+        }
+
+
+        void LenemyLaser()
+        {
+            Laser laser = new Laser();
+            laser.pos = new Point(Plane[0].pos.X - Plane[0].img.Width / 2, Plane[0].pos.Y + Plane[0].img.Height / 2);
+            //laser.x = Plane[0].x + Plane[0].img.Width / 2;
+            //laser.y = Plane[0].y;
+            laser.flag = 1;
+            Lasers.Add(laser);
+        }
 
         void animatewizard()
         {
@@ -745,12 +805,12 @@ namespace multimedia_game
 
        /* public void UpdateAnimation()
         {
-            *//*if(health<=0)
+            /*if(health<=0)
             {
 
             }*//*
         }*/
-        void drawbullet()
+            void drawbullet()
         {
 
             if (hero != null)
@@ -844,6 +904,8 @@ namespace multimedia_game
                         }
                     }
                 }
+
+
 
                 
 
@@ -1010,8 +1072,18 @@ namespace multimedia_game
             }
 
 
+            for(int i = 0; i < Plane.Count; i++)
+            {
+                g2.DrawImage(Plane[i].img, Plane[i].pos);
+            }
+            if (isLaserVisible)
+            {
+                for (int i = 0; i < Lasers.Count; i++)
+                {
 
-
+                    g2.DrawLine(Lasers[i].Pen, Lasers[i].pos.X, Lasers[i].pos.Y, Lasers[i].pos.X - 50, Lasers[i].pos.Y);
+                }
+            }
 
             if (hero != null)
             {
